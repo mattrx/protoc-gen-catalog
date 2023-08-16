@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/mattrx/protoc-gen-library/model"
+	"github.com/mattrx/protoc-gen-catalog/model"
 	"google.golang.org/protobuf/compiler/protogen"
 )
 

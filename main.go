@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/mattrx/protoc-gen-library/model"
-	"github.com/mattrx/protoc-gen-library/renderer"
+	"github.com/mattrx/protoc-gen-catalog/model"
+	"github.com/mattrx/protoc-gen-catalog/renderer"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/descriptorpb"
 )

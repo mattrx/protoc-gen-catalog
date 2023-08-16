@@ -1,1 +1,1 @@
-# protoc-gen-library
+# protoc-gen-catalog

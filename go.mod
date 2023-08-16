@@ -1,4 +1,4 @@
-module github.com/mattrx/protoc-gen-library
+module github.com/mattrx/protoc-gen-catalog
 
 go 1.20
 
