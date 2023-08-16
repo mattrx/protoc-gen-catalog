@@ -5,13 +5,12 @@ import (
 	"strings"
 
 	"github.com/mattrx/protoc-gen-library/model"
-	"github.com/mattrx/protoc-gen-library/renderer/html"
+	"github.com/mattrx/protoc-gen-library/renderer"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var filterRegex *regexp.Regexp = regexp.MustCompile(".*")
-var groupingRegex *regexp.Regexp = regexp.MustCompile("^$")
 
 func main() {
 	protogen.Options{
@@ -23,49 +22,38 @@ func main() {
 					return err
 				}
 				filterRegex = r
-			case "grouping":
-				r, err := regexp.Compile(value)
-				if err != nil {
-					return err
-				}
-				groupingRegex = r
 			}
 
 			return nil
 		},
 	}.Run(func(gen *protogen.Plugin) error {
-		groups := map[string]*model.Group{}
+		entities := map[string]model.Entity{}
 
 		for _, file := range gen.Files {
 			for _, message := range file.Messages {
-				collect(groups, message)
+				collect(entities, message)
 			}
 		}
 
-		groupList := []*model.Group{}
-		for _, g := range groups {
-			groupList = append(groupList, g)
+		for _, e := range entities {
+			if e, ok := e.(*model.Message); ok {
+				for _, f := range e.GetFields() {
+					if e1, ok := entities[f.GetKind()]; ok {
+						f.SetEntity(e1.(model.Entity))
+						e1.AddUsage(f)
+					}
+				}
+			}
 		}
 
-		return html.Render(gen, groupList)
+		return renderer.Do(gen, entities, filterRegex)
 	})
 }
 
-func collect(groupMap map[string]*model.Group, m *protogen.Message) {
-
-	if !filterRegex.MatchString(string(m.Desc.FullName())) {
-		return
-	}
+func collect(entityMap map[string]model.Entity, m *protogen.Message) {
 
 	for _, message := range m.Messages {
-		collect(groupMap, message)
-	}
-
-	groupName := groupingRegex.FindString(string(m.Desc.FullName()))
-	group, ok := groupMap[groupName]
-	if !ok {
-		group = model.NewGroup(groupName)
-		groupMap[groupName] = group
+		collect(entityMap, message)
 	}
 
 	for i := 0; i < m.Desc.Enums().Len(); i++ {
@@ -82,7 +70,7 @@ func collect(groupMap map[string]*model.Group, m *protogen.Message) {
 			enum.AddValue(string(m.Desc.Enums().Get(i).Values().Get(j).Name()))
 		}
 
-		group.AddEntity(enum)
+		entityMap[enum.GetName()] = enum
 	}
 
 	if len(m.Fields) > 0 {
@@ -128,6 +116,6 @@ func collect(groupMap map[string]*model.Group, m *protogen.Message) {
 
 		}
 
-		group.AddEntity(message)
+		entityMap[message.GetName()] = message
 	}
 }

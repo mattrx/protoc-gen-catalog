@@ -4,6 +4,7 @@ type Enum struct {
 	deprecated  bool
 	description string
 	name        string
+	usages      []*Field
 	values      []string
 }
 
@@ -36,4 +37,12 @@ func (e *Enum) AddValue(v string) {
 
 func (e Enum) GetValues() []string {
 	return e.values
+}
+
+func (e *Enum) AddUsage(v *Field) {
+	e.usages = append(e.usages, v)
+}
+
+func (e Enum) IsUsed() bool {
+	return len(e.usages) != 0
 }

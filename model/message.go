@@ -5,6 +5,7 @@ type Message struct {
 	description string
 	fields      []*Field
 	name        string
+	usages      []*Field
 }
 
 func NewMessage(name string, description string) *Message {
@@ -36,4 +37,12 @@ func (e *Message) AddField(v *Field) {
 
 func (e Message) GetFields() []*Field {
 	return e.fields
+}
+
+func (e *Message) AddUsage(v *Field) {
+	e.usages = append(e.usages, v)
+}
+
+func (e Message) IsUsed() bool {
+	return len(e.usages) != 0
 }

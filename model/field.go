@@ -3,9 +3,10 @@ package model
 type Field struct {
 	deprecated  bool
 	description string
+	entity      Entity
+	kind        string
 	labels      []string
 	name        string
-	kind        string
 }
 
 func NewField(name string, description string) *Field {
@@ -45,4 +46,12 @@ func (e *Field) AddLabel(v string) {
 
 func (e Field) GetLabels() []string {
 	return e.labels
+}
+
+func (e *Field) SetEntity(v Entity) {
+	e.entity = v
+}
+
+func (e Field) GetEntity() Entity {
+	return e.entity
 }
